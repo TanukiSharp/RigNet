@@ -64,7 +64,7 @@ def show_obj_skel(mesh_name, root):
     #param = o3d.io.read_pinhole_camera_parameters('sideview.json')
     #ctr.convert_from_pinhole_camera_parameters(param)
 
-    vis.run()
+    #vis.run() # <--- Must not be called to run headless.
     #vis.update_geometry()
     #vis.poll_events()
     #vis.update_renderer()

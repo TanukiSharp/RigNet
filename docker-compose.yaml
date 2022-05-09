@@ -1,0 +1,16 @@
+version: '3.3'
+
+services:
+    rignet:
+        build:
+            context: .
+        volumes:
+            - ./quick_start:/app/quick_start
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          capabilities: [ gpu ]
+                          count: 1
+        command: xvfb-run --server-args='-screen 0 1920x1080x24' python ./quick_start.py
