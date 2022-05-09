@@ -29,20 +29,20 @@ RUN apt update && \
 RUN pip install --no-cache-dir \
     -f https://download.pytorch.org/whl/torch_stable.html \
     -f https://pytorch-geometric.com/whl/torch-1.7.1+cu110.html \
-    numpy \
-    scipy \
-    matplotlib \
-    tensorboard \
-    open3d==0.9.0 \
-    opencv-python \
-    rtree==0.8 \
-    trimesh==3.10.2 \
+    numpy==1.19.* \
+    scipy==1.5.* \
+    matplotlib==3.3.* \
+    tensorboard==2.9.* \
+    open3d==0.9.* \
+    opencv-python==4.5.* \
+    rtree==0.8.* \
+    trimesh==3.10.* \
     torch==1.7.1+cu110 \
     torchvision==0.8.2+cu110 \
-    torch-geometric==1.7.2 \
-    torch-scatter \
-    torch-sparse \
-    torch-cluster
+    torch-geometric==1.7.* \
+    torch-scatter==2.0.* \
+    torch-sparse==0.6.* \
+    torch-cluster==1.5.*
 
 WORKDIR /app
 
