@@ -28,6 +28,12 @@ docker build .
 
 `docker-compose` is not required to build the container image.
 
+:warning: If you are building on a machine equipped with the Apple M1 CPU (ARM architecture) you might run into issues while building the container. To fix the problem, add the following parameters to the docker build command to create an image with the correct architecture.
+
+```
+docker buildx build --platform linux/amd64 .
+```
+
 ## Runtime input data
 
 First, open the `quick_start.py` source file and look for the line `model_id, bandwidth, threshold = `, and change it to load the model you want, with the parameters you want.
