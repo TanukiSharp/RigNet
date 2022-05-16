@@ -13,4 +13,3 @@ services:
                         - driver: nvidia
                           capabilities: [ gpu ]
                           count: 1
-        command: xvfb-run --server-args='-screen 0 1920x1080x24' python ./run.py

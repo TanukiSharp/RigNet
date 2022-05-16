@@ -51,7 +51,7 @@ COPY ./datasets/ ./datasets
 COPY ./geometric_proc/ ./geometric_proc
 COPY ./models/ ./models
 COPY ./utils/ ./utils
-COPY gen_dataset.py maya_save_fbx.py mst_generate.py quick_start.py run.py run_skinning.py binvox ./
+COPY gen_dataset.py maya_save_fbx.py mst_generate.py quick_start.py run.py run.sh run_skinning.py binvox ./
 
 ENTRYPOINT [ "/usr/bin/dumb-init", "-c", "--" ]
 

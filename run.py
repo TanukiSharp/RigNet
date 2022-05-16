@@ -31,9 +31,6 @@ if __name__ == '__main__':
 
     input_folder = 'data'
 
-    # Comment this call if you want to keep intermediate files produced by a previous run.
-    delete_normalized_files(input_folder)
-
     high_res_model_filename = sys.argv[1]
     low_res_model_filename = sys.argv[2]
 
@@ -118,7 +115,7 @@ if __name__ == '__main__':
     pred_rig = tranfer_to_ori_mesh(mesh_filename_ori, mesh_filename, pred_rig)
     pred_rig.save(mesh_filename_ori.replace('.obj', '_rig.txt'))
 
-    normalized_files = glob.glob('*_normlalized.*') + glob.glob('*_normlalized_simplified.*')
-    print(normalized_files)
+    # Comment this call if you want to keep intermediate files produced by a previous run.
+    delete_normalized_files(input_folder)
 
     print('Done!')
