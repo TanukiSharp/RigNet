@@ -11,8 +11,8 @@ import os
 import sys
 import glob
 
-def delete_normalized_files():
-    data_path = os.path.join(os.getcwd(), 'data')
+def delete_normalized_files(base_path):
+    data_path = os.path.join(os.getcwd(), base_path)
     normalized_files = glob.glob(os.path.join(data_path, '*_normalized.*')) + glob.glob(os.path.join(data_path, '*_normalized_simplified.*'))
 
     for normalized_file in normalized_files:
@@ -24,14 +24,14 @@ def delete_normalized_files():
 if __name__ == '__main__':
     global device
 
-    # Comment this call if you want to keep intermediate files produced by a previous run.
-    delete_normalized_files()
-
     if len(sys.argv) < 3:
         print('At least two arguments are required')
         sys.exit(-1)
 
-    input_folder = 'data/'
+    input_folder = 'data'
+
+    # Comment this call if you want to keep intermediate files produced by a previous run.
+    delete_normalized_files(input_folder)
 
     high_res_model_filename = sys.argv[1]
     low_res_model_filename = sys.argv[2]
