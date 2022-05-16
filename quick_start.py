@@ -52,13 +52,13 @@ def normalize_obj(mesh_v):
     return mesh_v, pivot, scale
 
 
-def create_single_data(mesh_filaname):
+def create_single_data(mesh_filename):
     """
     create input data for the network. The data is wrapped by Data structure in pytorch-geometric library
-    :param mesh_filaname: name of the input mesh
+    :param mesh_filename: name of the input mesh
     :return: wrapped data, voxelized mesh, and geodesic distance matrix of all vertices
     """
-    mesh = o3d.io.read_triangle_mesh(mesh_filaname)
+    mesh = o3d.io.read_triangle_mesh(mesh_filename)
     mesh.compute_vertex_normals()
     mesh_v = np.asarray(mesh.vertices)
     mesh_vn = np.asarray(mesh.vertex_normals)
@@ -66,7 +66,7 @@ def create_single_data(mesh_filaname):
 
     mesh_v, translation_normalize, scale_normalize = normalize_obj(mesh_v)
     mesh_normalized = o3d.geometry.TriangleMesh(vertices=o3d.utility.Vector3dVector(mesh_v), triangles=o3d.utility.Vector3iVector(mesh_f))
-    o3d.io.write_triangle_mesh(mesh_filename.replace("_remesh.obj", "_normalized.obj"), mesh_normalized)
+    o3d.io.write_triangle_mesh(mesh_filename.replace(".obj", "_normalized.obj"), mesh_normalized)
 
     # vertices
     v = np.concatenate((mesh_v, mesh_vn), axis=1)
@@ -92,15 +92,15 @@ def create_single_data(mesh_filaname):
     batch = torch.zeros(len(v), dtype=torch.long)
 
     # voxel
-    if not os.path.exists(mesh_filaname.replace('_remesh.obj', '_normalized.binvox')):
+    if not os.path.exists(mesh_filename.replace('.obj', '_normalized.binvox')):
         if platform == "linux" or platform == "linux2":
-            os.system("./binvox -d 88 -pb " + mesh_filaname.replace("_remesh.obj", "_normalized.obj"))
+            os.system("./binvox -d 88 -pb " + mesh_filename.replace(".obj", "_normalized.obj"))
         elif platform == "win32":
-            os.system("binvox.exe -d 88 " + mesh_filaname.replace("_remesh.obj", "_normalized.obj"))
+            os.system("binvox.exe -d 88 " + mesh_filename.replace(".obj", "_normalized.obj"))
         else:
             raise Exception('Sorry, we currently only support windows and linux.')
 
-    with open(mesh_filaname.replace('_remesh.obj', '_normalized.binvox'), 'rb') as fvox:
+    with open(mesh_filename.replace('.obj', '_normalized.binvox'), 'rb') as fvox:
         vox = binvox_rw.read_as_3d_array(fvox)
 
     data = Data(x=v[:, 3:6], pos=v[:, 0:3], tpl_edge_index=tpl_e, geo_edge_index=geo_e, batch=batch)
@@ -272,7 +272,7 @@ def calc_geodesic_matrix(bones, mesh_v, surface_geodesic, mesh_filename, subsamp
     return visible_matrix
 
 
-def predict_skinning(input_data, pred_skel, skin_pred_net, surface_geodesic, mesh_filename, subsampling=False):
+def predict_skinning(device, input_data, pred_skel, skin_pred_net, surface_geodesic, mesh_filename, subsampling=False):
     """
     predict skinning
     :param input_data: wrapped input data
@@ -282,7 +282,6 @@ def predict_skinning(input_data, pred_skel, skin_pred_net, surface_geodesic, mes
     :param mesh_filename: mesh filename
     :return: predicted rig with skinning weights information
     """
-    global device, output_folder
     num_nearest_bone = 5
     bones, bone_names, bone_isleaf = get_bones(pred_skel)
     mesh_v = input_data.pos.data.cpu().numpy()
@@ -442,14 +441,14 @@ if __name__ == '__main__':
 
     print("predicting joints")
     data = predict_joints(data, vox, jointNet, threshold, bandwidth=bandwidth,
-                          mesh_filename=mesh_filename.replace("_remesh.obj", "_normalized.obj"))
+                          mesh_filename=mesh_filename.replace(".obj", "_normalized.obj"))
     data.to(device)
     print("predicting connectivity")
     pred_skeleton = predict_skeleton(data, vox, rootNet, boneNet,
-                                     mesh_filename=mesh_filename.replace("_remesh.obj", "_normalized.obj"))
+                                     mesh_filename=mesh_filename.replace(".obj", "_normalized.obj"))
     print("predicting skinning")
-    pred_rig = predict_skinning(data, pred_skeleton, skinNet, surface_geodesic,
-                                mesh_filename.replace("_remesh.obj", "_normalized.obj"),
+    pred_rig = predict_skinning(device, data, pred_skeleton, skinNet, surface_geodesic,
+                                mesh_filename.replace(".obj", "_normalized.obj"),
                                 subsampling=downsample_skinning)
 
     # here we reverse the normalization to the original scale and position
