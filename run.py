@@ -25,7 +25,8 @@ if __name__ == '__main__':
     global device
 
     if len(sys.argv) < 3:
-        print('At least two arguments are required')
+        print('At least two arguments are required.')
+        print('High resolution model as first argument (original), low resolution model as second argument (remeshed).')
         sys.exit(-1)
 
     input_folder = 'data'
