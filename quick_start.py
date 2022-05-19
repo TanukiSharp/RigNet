@@ -7,6 +7,7 @@
 # ---------------------------------------------------------------------------------------------------------
 
 import os
+import time
 from sys import platform
 import trimesh
 import numpy as np
@@ -372,6 +373,8 @@ def tranfer_to_ori_mesh(filename_ori, filename_remesh, pred_rig):
 
 
 if __name__ == '__main__':
+    start_time = time.perf_counter()
+
     input_folder = "quick_start/"
 
     # downsample_skinning is used to speed up the calculation of volumetric geodesic distance
@@ -463,4 +466,5 @@ if __name__ == '__main__':
     else:
         # here we use remeshed mesh
         pred_rig.save(mesh_filename.replace('.obj', '_rig.txt'))
-    print("Done!")
+
+    print(f'Done in {time.perf_counter() - start_time:.2f}s')

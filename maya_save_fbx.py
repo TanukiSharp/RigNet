@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        maya_save_fbx.py
-# Purpose:     run this scriptin maya. Assemble predicted rig (.txt) and obj 
+# Purpose:     run this scriptin maya. Assemble predicted rig (.txt) and obj
 #              mesh together to a FBX file
 # RigNet Copyright 2020 University of Massachusetts
 # RigNet is made available under General Public License Version 3 (GPLv3), or under a Commercial License.
@@ -13,7 +13,7 @@ import numpy as np
 import pymel.core as pm
 import os
 import glob
-
+import time
 
 def loadInfo(info_name, geo_name):
     f_info = open(info_name,'r')
@@ -37,7 +37,7 @@ def loadInfo(info_name, geo_name):
             skin_item = word[1:]
             joint_skin.append(skin_item)
     f_info.close()
-    
+
     this_level = [root_name]
     while this_level:
         next_level = []
@@ -48,7 +48,7 @@ def loadInfo(info_name, geo_name):
                     child_pos = joint_pos[c_node]
                     cmds.joint(p=(child_pos[0], child_pos[1],child_pos[2]), name = c_node)
                     next_level.append(c_node)
-        this_level = next_level         
+        this_level = next_level
     cmds.joint(root_name, e=True, oj='xyz', sao='yup', ch=True, zso=True)
     cmds.skinCluster( root_name, geo_name)
     #print len(joint_skin)
@@ -57,7 +57,7 @@ def loadInfo(info_name, geo_name):
         transValue = []
         for j in range(1,len(joint_skin[i]),2):
             transValue_item = (joint_skin[i][j], float(joint_skin[i][j+1]))
-            transValue.append(transValue_item) 
+            transValue.append(transValue_item)
         #print vtx_name, transValue
         cmds.skinPercent( 'skinCluster1', vtx_name, transformValue=transValue)
     cmds.skinPercent( 'skinCluster1', geo_name, pruneWeights=0.01, normalize=False )
@@ -78,16 +78,18 @@ def getGeometryGroups():
     if not geo_list:
         geo_list = cmds.ls(type='surfaceShape')
     return geo_list
-    
-    
+
+
 if __name__ == '__main__':
+    start_time = time.perf_counter()
+
     #model_id = "17872"
     model_id = "smith"
     print(model_id)
     obj_name = 'D:\\{:s}_ori.obj'.format(model_id)
     info_name = 'D:\\{:s}_ori_rig.txt'.format(model_id)
     out_name = 'D:\\{:s}.fbx'.format(model_id)
-       
+
     # import obj
     cmds.file(new=True,force=True)
     cmds.file(obj_name, o=True)
@@ -95,6 +97,8 @@ if __name__ == '__main__':
     # import info
     geo_list = getGeometryGroups()
     root_name, _ = loadInfo(info_name, geo_list[0])
-    
+
     # export fbx
     pm.mel.FBXExport(f=out_name)
+
+    print(f'Done in {time.perf_counter() - start_time:.2f}s')
