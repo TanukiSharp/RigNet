@@ -10,6 +10,7 @@ import torch
 import os
 import sys
 import glob
+import time
 
 def delete_normalized_files(base_path):
     data_path = os.path.join(os.getcwd(), base_path)
@@ -24,6 +25,8 @@ def delete_normalized_files(base_path):
 if __name__ == '__main__':
     global device
 
+    start_time = time.perf_counter()
+
     if len(sys.argv) < 3:
         print('At least two arguments are required.')
         print('High resolution model as first argument (original), low resolution model as second argument (remeshed).')
@@ -35,6 +38,11 @@ if __name__ == '__main__':
     low_res_model_filename = sys.argv[2]
 
     bandwidth = 0.0429
+
+    #threshold = 0.5e-4 # not working
+    #threshold = 1e-4   # not working
+    #threshold = 1e-6   # OK
+    #threshold = 1e-5   # OK
     threshold = 1e-6
 
     if len(sys.argv) > 3:
@@ -113,9 +121,9 @@ if __name__ == '__main__':
     # here we use original mesh tesselation (without remeshing)
     mesh_filename_ori = os.path.join(input_folder, high_res_model_filename)
     pred_rig = tranfer_to_ori_mesh(mesh_filename_ori, mesh_filename, pred_rig)
-    pred_rig.save(mesh_filename_ori.replace('.obj', '_rig.txt'))
+    pred_rig.save(mesh_filename.replace('.obj', '_rig.txt'))
 
     # Comment this call if you want to keep intermediate files produced by a previous run.
     delete_normalized_files(input_folder)
 
-    print('Done!')
+    print(f'Done in {time.perf_counter() - start_time:.2f}s')
